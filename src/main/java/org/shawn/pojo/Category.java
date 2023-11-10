@@ -1,7 +1,13 @@
 package org.shawn.pojo;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+@AllArgsConstructor
+@Data
+@NoArgsConstructor
 public class Category {
     private Integer id;//主键ID
     private String categoryName;//分类名称
