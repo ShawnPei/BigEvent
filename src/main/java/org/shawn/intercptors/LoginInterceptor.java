@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.shawn.pojo.Result;
 import org.shawn.utils.JwtUtil;
+import org.shawn.utils.ThreadLocalUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -20,6 +21,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         //2.验证token
         try {
             Map<String, Object> claims = JwtUtil.parseToken(token);
+            //把token中的id，存放到ThreadLocal中
+            ThreadLocalUtil.set(claims);
             //此时验证成功，就需要返回true，这就意味着拦截判断通过，可以放行
             return true;
         } catch (Exception e) {
@@ -27,5 +30,10 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.setStatus(401);
             return false;
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        ThreadLocalUtil.remove();
     }
 }

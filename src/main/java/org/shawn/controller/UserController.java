@@ -1,6 +1,6 @@
 package org.shawn.controller;
 
-import jakarta.annotation.Resource;
+
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.shawn.pojo.Result;
@@ -8,12 +8,13 @@ import org.shawn.pojo.User;
 import org.shawn.service.UserService;
 import org.shawn.utils.JwtUtil;
 import org.shawn.utils.Md5Util;
+import org.shawn.utils.ThreadLocalUtil;
+
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,5 +58,25 @@ public class UserController {
         }
         return Result.error("用户密码不正确");
 
+    }
+
+    @GetMapping("/userInfo")
+    public Result<User> userInfo() {
+        //根据用户名查询用户
+        /**
+         * 接口文档中，这个接口无方法参数，但是所有的请求都会携带token，而我们在token中存放了用户id和姓名
+         * 可以使用token中的信息，来查询用户
+         */
+        Map<String,Object> map = ThreadLocalUtil.get();
+        String username = (String) map.get("username");
+        //根据用户名查询用户
+        User user = userService.findByUserName(username);
+        return Result.success(user);
+    }
+
+    @PutMapping("/update")
+    public Result update(@RequestBody @Validated User user) {
+        userService.update(user);
+        return Result.success();
     }
 }

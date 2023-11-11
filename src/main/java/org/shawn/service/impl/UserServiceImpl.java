@@ -7,6 +7,8 @@ import org.shawn.service.UserService;
 import org.shawn.utils.Md5Util;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -25,5 +27,11 @@ public class UserServiceImpl implements UserService {
         //添加用户
         userMapper.add(username,encryptedPwd);
 
+    }
+
+    @Override
+    public void update(User user) {
+        user.setUpdateTime(LocalDateTime.now());
+        userMapper.update(user);
     }
 }
