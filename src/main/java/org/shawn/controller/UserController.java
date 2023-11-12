@@ -1,8 +1,11 @@
 package org.shawn.controller;
 
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.URL;
 import org.shawn.pojo.Result;
 import org.shawn.pojo.User;
@@ -21,12 +24,21 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@Slf4j
+@Api(tags = "用户相关接口")
 @RequestMapping("/user")
 public class UserController {
 
 
     private final UserService userService;
 
+    /**
+     * 用户注册
+     * @param username
+     * @param password
+     * @return
+     */
+    @ApiOperation("用户注册接口")
     @PostMapping("/register")
     public Result register(@Pattern(regexp = "^\\S{5,16}$") String username,@Pattern(regexp = "^\\S{5,16}$")  String password) {
         //参数校验
@@ -41,6 +53,13 @@ public class UserController {
         }
     }
 
+    /**
+     * 用户登录
+     * @param username
+     * @param password
+     * @return
+     */
+    @ApiOperation("用户登录接口")
     @PostMapping("/login")
     public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username,@Pattern(regexp = "^\\S{5,16}$")  String password) {
         //查询用户是否存在
@@ -62,6 +81,11 @@ public class UserController {
 
     }
 
+    /**
+     * 用户查询
+     * @return
+     */
+    @ApiOperation("用户查询接口")
     @GetMapping("/userInfo")
     public Result<User> userInfo() {
         //根据用户名查询用户
@@ -76,18 +100,36 @@ public class UserController {
         return Result.success(user);
     }
 
+    /**
+     * 用户更新信息
+     * @param user
+     * @return
+     */
+    @ApiOperation("用户更新信息接口")
     @PutMapping("/update")
     public Result update(@RequestBody @Validated User user) {
         userService.update(user);
         return Result.success();
     }
 
+    /**
+     * 用户更新头像
+     * @param avatarUrl
+     * @return
+     */
+    @ApiOperation("用户更新头像接口")
     @PatchMapping("/updateAvatar")
     public Result updateAvatar(@RequestParam @URL String avatarUrl) {
         userService.updateAvatar(avatarUrl);
         return Result.success();
     }
 
+    /**
+     * 用户更新密码
+     * @param map
+     * @return
+     */
+    @ApiOperation("用户更新密码接口")
     @PatchMapping("/updatePwd")
     public Result updatePwd(@RequestBody Map<String,String> map) {
         //参数校验
