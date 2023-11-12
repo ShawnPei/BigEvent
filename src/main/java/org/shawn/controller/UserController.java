@@ -3,6 +3,7 @@ package org.shawn.controller;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 import org.shawn.pojo.Result;
 import org.shawn.pojo.User;
 import org.shawn.service.UserService;
@@ -10,6 +11,7 @@ import org.shawn.utils.JwtUtil;
 import org.shawn.utils.Md5Util;
 import org.shawn.utils.ThreadLocalUtil;
 
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,4 +81,39 @@ public class UserController {
         userService.update(user);
         return Result.success();
     }
+
+    @PatchMapping("/updateAvatar")
+    public Result updateAvatar(@RequestParam @URL String avatarUrl) {
+        userService.updateAvatar(avatarUrl);
+        return Result.success();
+    }
+
+    @PatchMapping("/updatePwd")
+    public Result updatePwd(@RequestBody Map<String,String> map) {
+        //参数校验
+        String oldPwd = map.get("old_pwd");//用户输入的，未加密
+        String newPwd = map.get("new_pwd");
+        String rePwd = map.get("re_pwd");
+
+        if(!StringUtils.hasLength(oldPwd) || !StringUtils.hasLength(newPwd) || !StringUtils.hasLength(rePwd)) {
+            return Result.error("缺少必备信息");
+        }
+
+        //从Threadlocal中获取用户信息，再获取用户名。
+        Map<String,Object> info = ThreadLocalUtil.get();
+        String username = (String) info.get("username");
+        //根据用户名查询用户
+        User user = userService.findByUserName(username);
+        String password = user.getPassword();
+        if (!Md5Util.checkPassword(map.get("old_pwd"),password)) {
+            return Result.error("旧密码不正确");
+        }
+
+        if(!newPwd.equals(rePwd)) {
+            return Result.error("输入的新密码不一致");
+        }
+        userService.updatePwd(newPwd);
+        return Result.success();
+    }
+
 }
