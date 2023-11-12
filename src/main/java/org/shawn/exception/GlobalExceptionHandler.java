@@ -1,5 +1,6 @@
 package org.shawn.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.shawn.pojo.Result;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ExceptionHandler;

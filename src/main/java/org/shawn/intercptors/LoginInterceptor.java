@@ -2,6 +2,7 @@ package org.shawn.intercptors;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.shawn.pojo.Result;
 import org.shawn.utils.JwtUtil;
 import org.shawn.utils.ThreadLocalUtil;
@@ -16,6 +17,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //令牌验证
         //1.从请求中获取token
+
         String token = request.getHeader("Authorization");
 
         //2.验证token

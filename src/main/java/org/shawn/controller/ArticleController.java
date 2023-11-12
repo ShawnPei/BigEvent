@@ -1,8 +1,8 @@
 package org.shawn.controller;
 
 
-import io.swagger.annotations.Api;
-import lombok.extern.slf4j.Slf4j;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.shawn.pojo.Result;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/article")
-@Slf4j
-@Api(tags = "文章相关接口")
+@Tag(name = "文章相关接口")
 public class ArticleController {
 
     @GetMapping("/list")
