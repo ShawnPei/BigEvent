@@ -16,12 +16,15 @@ import org.shawn.utils.JwtUtil;
 import org.shawn.utils.Md5Util;
 import org.shawn.utils.ThreadLocalUtil;
 
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class UserController {
 
 
     private final UserService userService;
-
+    private final StringRedisTemplate stringRedisTemplate;
     /**
      * 用户注册
      * @param username
@@ -78,6 +81,10 @@ public class UserController {
             claims.put("id",user.getId());
             claims.put("username",user.getUsername());
             String token = JwtUtil.genToken(claims);
+
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            operations.set(token,token,1, TimeUnit.HOURS);
+
             return Result.success(token);
         }
         return Result.error("用户密码不正确");
@@ -138,7 +145,7 @@ public class UserController {
 
     @Operation(summary  = "用户更新密码接口")
     @PatchMapping("/updatePwd")
-    public Result updatePwd(@RequestBody Map<String,String> map) {
+    public Result updatePwd(@RequestBody Map<String,String> map, @RequestHeader("Authorization") String token) {
         //参数校验
         String oldPwd = map.get("old_pwd");//用户输入的，未加密
         String newPwd = map.get("new_pwd");
@@ -162,6 +169,7 @@ public class UserController {
             return Result.error("输入的新密码不一致");
         }
         userService.updatePwd(newPwd);
+        stringRedisTemplate.opsForValue().getOperations().delete(token);
         return Result.success();
     }
 
